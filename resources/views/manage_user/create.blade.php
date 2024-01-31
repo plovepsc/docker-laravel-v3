@@ -1,0 +1,178 @@
+@extends('layouts.app')
+
+@section('title', __( 'user.add_user' ))
+
+@section('content')
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <h1>@lang( 'user.add_user' )</h1>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    @component('components.widget', ['class' => 'box-primary'])
+        {!! Form::open(['url' => action('ManageUserController@store'), 'method' => 'POST', 'id' => 'user_edit_form' ]) !!}
+        <div class="col-md-2">
+            <div class="form-group">
+              {!! Form::label('surname', __( 'business.prefix' ) . ':') !!}
+                {!! Form::text('surname', null, ['class' => 'form-control', 'placeholder' => __( 'business.prefix_placeholder' ) ]); !!}
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="form-group">
+              {!! Form::label('first_name', __( 'business.first_name' ) . ':*') !!}
+                {!! Form::text('first_name', null, ['class' => 'form-control', 'required', 'placeholder' => __( 'business.first_name' ) ]); !!}
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="form-group">
+              {!! Form::label('last_name', __( 'business.last_name' ) . ':') !!}
+                {!! Form::text('last_name', null, ['class' => 'form-control', 'placeholder' => __( 'business.last_name' ) ]); !!}
+            </div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="col-md-12">
+            <div class="form-group">
+              {!! Form::label('email', __( 'business.email' ) . ':*') !!}
+                {!! Form::text('email', null, ['class' => 'form-control', 'required', 'placeholder' => __( 'business.email' ) ]); !!}
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+              {!! Form::label('role', __( 'user.role' ) . ':*') !!}
+                {!! Form::select('role', $roles, null, ['class' => 'form-control select2']); !!}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                {!! Form::label('username', __( 'business.username' ) . ':') !!}
+                @if(!empty($username_ext))
+                    <div class="input-group">
+                        {!! Form::text('username', null, ['class' => 'form-control', 'placeholder' => __( 'business.username' ) ]); !!}
+                        <span class="input-group-addon">{{$username_ext}}</span>
+                    </div>
+                    <p class="help-block" id="show_username"></p>
+                @else
+                    {!! Form::text('username', null, ['class' => 'form-control', 'placeholder' => __( 'business.username' ) ]); !!}
+                @endif
+                <p class="help-block">@lang('lang_v1.username_help')</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+              {!! Form::label('password', __( 'business.password' ) . ':') !!}
+                {!! Form::password('password', ['class' => 'form-control', 'placeholder' => __( 'business.password' ) ]); !!}
+                <p class="help-block">@lang('user.leave_password_blank')</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+              {!! Form::label('confirm_password', __( 'business.confirm_password' ) . ':') !!}
+                {!! Form::password('confirm_password', ['class' => 'form-control', 'placeholder' => __( 'business.confirm_password' ) ]); !!}
+
+            </div>
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="col-md-4">
+            <div class="form-group">
+              {!! Form::label('cmmsn_percent', __( 'lang_v1.cmmsn_percent' ) . ':') !!} @show_tooltip(__('lang_v1.commsn_percent_help'))
+                {!! Form::number('cmmsn_percent', null, ['class' => 'form-control', 'placeholder' => __( 'lang_v1.cmmsn_percent' ), 'step' => 0.01]); !!}
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="form-group">
+                <div class="checkbox">
+                <br/>
+                  <label>
+                    {!! Form::checkbox('selected_contacts', 1,
+                    null,
+                    [ 'class' => 'input-icheck', 'id' => 'selected_contacts']); !!} {{ __( 'lang_v1.enable_selected_contacts' ) }}
+                  </label>
+                  @show_tooltip(__('lang_v1.tooltip_enable_selected_contacts'))
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4 selected_contacts_div hide">
+            <div class="form-group">
+              {!! Form::label('selected_contacts', __('lang_v1.selected_contacts') . ':') !!}
+                <div class="form-group">
+                  {!! Form::select('selected_contact_ids[]', $contacts, null, ['class' => 'form-control select2', 'multiple', 'style' => 'width: 100%;' ]); !!}
+                </div>
+            </div>
+        </div>
+
+        <div class="clearfix"></div>
+        <div class="col-md-4">
+            <div class="form-group">
+              <div class="checkbox">
+                <label>
+                     {!! Form::checkbox('is_active', 'active', true, ['class' => 'input-icheck status']); !!} {{ __('lang_v1.status_for_user') }}
+                </label>
+                @show_tooltip(__('lang_v1.tooltip_enable_user_active'))
+              </div>
+            </div>
+        </div>
+
+        <div class="clearfix"></div>
+        <div class="col-md-12">
+        <button type="submit" class="btn btn-primary pull-right" id="submit_user_button">@lang( 'messages.save' )</button>
+        </div>
+        {!! Form::close() !!}
+    @endcomponent
+  @stop
+@section('javascript')
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('#selected_contacts').on('ifChecked', function(event){
+      $('div.selected_contacts_div').removeClass('hide');
+    });
+    $('#selected_contacts').on('ifUnchecked', function(event){
+      $('div.selected_contacts_div').addClass('hide');
+    });
+  });
+
+  $('form#user_edit_form').validate({
+                rules: {
+                    first_name: {
+                        required: true,
+                    },
+                    email: {
+                        email: true,
+                        remote: {
+                            url: "/business/register/check-email",
+                            type: "post",
+                            data: {
+                                email: function() {
+                                    return $( "#email" ).val();
+                                }
+                            }
+                        }
+                    },
+                    password: {
+                        minlength: 5
+                    },
+                    confirm_password: {
+                        equalTo: "#password",
+                    }
+                },
+                messages: {
+                    password: {
+                        minlength: 'Password should be minimum 5 characters',
+                    },
+                    confirm_password: {
+                        equalTo: 'Should be same as password'
+                    },
+                    username: {
+                        remote: 'Invalid username or User already exist'
+                    },
+                    email: {
+                        remote: '{{ __("validation.unique", ["attribute" => __("business.email")]) }}'
+                    }
+                }
+            });
+</script>
+@endsection
